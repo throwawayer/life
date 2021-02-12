@@ -1,0 +1,48 @@
+{
+  "parser": "@babel/eslint-parser",
+  "extends": ["airbnb", "airbnb/hooks"],
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "ecmaFeatures": { "jsx": true, "globalReturn": false },
+    "sourceType": "module",
+    "project": "./jsconfig.json",
+    "allowImportExportEverywhere": false
+  },
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true,
+    "jest": true
+  },
+  "plugins": ["react-hooks"],
+  "rules": {
+    "implicit-arrow-linebreak": "off",
+    "function-paren-newline": "off",
+    "max-len": ["error", { "code": 100 }],
+    "object-curly-newline": [
+      "error",
+      {
+        "ImportDeclaration": { "consistent": true, "minProperties": 0 }
+      }
+    ],
+    "operator-linebreak": ["error", "before", { "overrides": { "=": "after" } }],
+    "react/jsx-one-expression-per-line": ["error", { "allow": "single-child" }],
+    "react/jsx-props-no-spreading": [
+      "error",
+      {
+        "custom": "ignore",
+        "exceptions": ["button"]
+      }
+    ],
+    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }]
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx"],
+        "paths": ["./src/**/*"]
+      },
+      "babel-module": {}
+    }
+  }
+}

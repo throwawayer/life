@@ -1,0 +1,63 @@
+.btn
+  display inline-block
+  position relative
+  vertical-align middle
+  height 40px
+  width 160px
+  padding 0 16px
+  background-color $btn-bg-color-primary
+  color $white
+  font-size 18px
+  letter-spacing 1px
+  border-radius 2px
+  border-width 0 0 4px
+  border-color $btn-border-color-primary
+  text-align center
+  text-decoration none !important
+  cursor pointer
+  user-select none
+  box-shadow none
+  white-space nowrap
+  text-overflow ellipsis
+  transition 200ms
+
+  &::after
+    content ""
+    display inline-block
+    vertical-align middle
+    height 100%
+
+  &:hover
+    background-color saturate($btn-bg-color-primary, 40%)
+    border-color saturate($btn-border-color-primary, 40%)
+
+  &:active
+    background-color desaturate($btn-bg-color-primary, 40%)
+    border-color desaturate($btn-border-color-primary, 40%)
+
+  &:disabled
+    background-color alpha($btn-bg-color-primary, .3)
+    border-color alpha($btn-border-color-primary, .3)
+    cursor not-allowed
+
+  &--secondary
+    background-color $btn-bg-color-secondary
+    border-color $btn-border-color-secondary
+
+    &:hover
+      background-color saturate($btn-bg-color-secondary, 40%)
+      border-color saturate($btn-border-color-secondary, 40%)
+
+    &:active
+      background-color desaturate($btn-bg-color-secondary, 40%)
+      border-color desaturate($btn-border-color-secondary, 40%)
+
+    &:disabled
+      background-color alpha($btn-bg-color-secondary, .3)
+      border-color alpha($btn-border-color-secondary, .3)
+
+  &__text
+    display inline
+    vertical-align middle
+    position relative
+

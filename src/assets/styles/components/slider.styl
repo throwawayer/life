@@ -1,0 +1,21 @@
+.slider
+  display inherit
+  flex-direction column
+
+  &__item
+    @extend .bar
+
+    &::-webkit-slider-thumb
+      width 24px
+      height 24px
+      background $btn-bg-color-secondary
+      cursor pointer
+      -webkit-appearance: none
+      appearance none
+
+    &::-moz-range-thumb
+      width 24px
+      height 24px
+      background $btn-bg-color-secondary
+      cursor pointer
+

@@ -1,0 +1,57 @@
+.game
+  display block
+
+  &-row
+    display block
+    line-height 0
+
+    &__cell
+      display inline-block
+      vertical-align middle
+      height 84px
+      width 84px
+      line-height 84px
+      text-align center
+      border 1px solid #a23737
+      will-change height, width, line-height, background
+
+      ^[1]--medium &
+        height 42px
+        width 42px
+        line-height 42px
+
+        &--alive
+          &::before
+            height 42px
+            width 42px
+
+      ^[1]--large &
+        height 28px
+        width 28px
+        line-height 28px
+
+        &--alive
+          &::before
+            height 28px
+            width 28px
+
+      ^[1]--huge &
+        height 21px
+        width 21px
+        line-height 19px
+
+        &--alive
+          &::before
+            vertical-align initial
+            height 19px
+            width 19px
+
+      &--alive
+        &::before
+          content ''
+          display inline-block
+          vertical-align middle
+          width 84px
+          height 84px
+          background linear-gradient(90deg, #c51445, #c58714)
+

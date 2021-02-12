@@ -1,0 +1,19 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "lib": ["dom", "ESNext"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "esnext",
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "jsx": "react",
+    "strict": true,
+    "removeComments": true,
+    "paths": {
+      "*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/node_modules/*", "./dist"]
+}
