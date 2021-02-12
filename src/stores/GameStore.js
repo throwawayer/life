@@ -68,20 +68,24 @@ export default class GameStore {
 
   updateGrid() {
     runInAction(() => {
-      this.gridItems = this.gridItems.map((gridItem, index) => {
+      this.gridItems = this.gridItems.map((gridItem, cellIndex) => {
         const livingSurroundingCells = [];
 
         for (let i = -1; i < 2; i += 1) {
           // upper cells check
-          const upperCellIndex = index - this.gridRowSize + i;
+          let upperCellIndex = cellIndex - this.gridRowSize + i;
 
-          if (upperCellIndex > 0 && this.gridItems[upperCellIndex]) {
+          if (upperCellIndex < 0) {
+            upperCellIndex += this.totalGridSize;
+          }
+
+          if (this.gridItems[upperCellIndex]) {
             livingSurroundingCells.push(true);
           }
 
           // lateral cells check (i === 0 ignored, because it's the current cell)
           if (i !== 0) {
-            const lateralCellIndex = index + i;
+            const lateralCellIndex = cellIndex + i;
 
             if (
               lateralCellIndex > 0
@@ -93,9 +97,13 @@ export default class GameStore {
           }
 
           // bottom cells check
-          const bottomCellIndex = index + this.gridRowSize + i;
+          let bottomCellIndex = cellIndex + this.gridRowSize + i;
 
-          if (bottomCellIndex < this.totalGridSize && this.gridItems[bottomCellIndex]) {
+          if (bottomCellIndex > this.totalGridSize) {
+            bottomCellIndex -= this.totalGridSize;
+          }
+
+          if (this.gridItems[bottomCellIndex]) {
             livingSurroundingCells.push(true);
           }
         }

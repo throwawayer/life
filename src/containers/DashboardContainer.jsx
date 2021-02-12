@@ -87,6 +87,7 @@ const DashboardContainer = observer(() => {
   React.useEffect(() => {
     if (isGridEmpty && generationCount > 0) {
       setGenerationCount(0);
+      setIsStarted(false);
     }
   }, [generationCount, isGridEmpty]);
 
