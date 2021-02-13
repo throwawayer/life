@@ -1,103 +1,131 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback, useContext, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { GameStoreContext } from 'stores/GameStore';
 import Dashboard from 'components/Dashboard';
-import { gridSpeeds, gridPatternsEnum } from 'consts/enums';
+import { gridSpeeds, gridPatternsEnum, keysEnum } from 'consts/enums';
 
 const DashboardContainer = observer(() => {
-  const intervalLoop = React.useRef(0);
+  const intervalLoop = useRef(0);
+  const currentSpeedSet = useRef(0);
 
-  const [isStarted, setIsStarted] = React.useState(false);
-  const [generationCount, setGenerationCount] = React.useState(0);
+  const [isStarted, setIsStarted] = useState(false);
+  const [generationCount, setGenerationCount] = useState(0);
 
-  const gameStore = React.useContext(GameStoreContext);
-  const { isGridEmpty, gridSize, gridSpeed, gridPattern } = gameStore;
-  const clearGrid = gameStore.clearGrid.bind(gameStore);
-  const resetGrid = gameStore.resetGrid.bind(gameStore);
-  const updateGrid = gameStore.updateGrid.bind(gameStore);
-  const setGridSpeed = gameStore.setGridSpeed.bind(gameStore);
-  const setGridSize = gameStore.setGridSize.bind(gameStore);
-  const setFirstGenerationGrid = gameStore.setFirstGenerationGrid.bind(gameStore);
-  const setPatternGrid = gameStore.setPatternGrid.bind(gameStore);
+  const gameStore = useContext(GameStoreContext);
 
-  const calculateNextStep = React.useCallback(() => {
-    if (generationCount > 0 && isGridEmpty) {
+  const handleStartOrStop = useCallback(() => {
+    setIsStarted((started) => !started);
+  }, []);
+
+  const handleNext = useCallback(() => {
+    if (!gameStore.isGridEmpty) {
+      setGenerationCount((gCount) => gCount + 1);
+    }
+  }, [gameStore]);
+
+  const handleResetOrClear = useCallback(() => {
+    setGenerationCount((gCount) => {
+      if (gCount > 0) {
+        gameStore.resetGrid();
+        return 0;
+      }
+
+      gameStore.clearGrid();
+      return gCount;
+    });
+  }, [gameStore]);
+
+  const handleSpeedChange = useCallback(
+    (value) => {
+      gameStore.setGridSpeed(value);
+    },
+    [gameStore],
+  );
+
+  const handleGridSizeChange = useCallback(
+    (value) => {
+      gameStore.setGridSize(value);
+    },
+    [gameStore],
+  );
+
+  const handlePatternChange = useCallback(
+    (value) => {
+      setGenerationCount(() => {
+        const size = Object.keys(gridPatternsEnum)[value];
+        const letter = size.slice(size.length - 1);
+
+        gameStore.setPatternGrid(value, letter);
+
+        return 0;
+      });
+    },
+    [gameStore],
+  );
+
+  useEffect(() => {
+    if (generationCount > 0) {
+      if (generationCount === 1) {
+        gameStore.setFirstGenerationGrid();
+      }
+
+      gameStore.updateGrid();
+    }
+  }, [gameStore, generationCount]);
+
+  useEffect(() => {
+    if (gameStore.isGridEmpty && generationCount > 0) {
       setIsStarted(false);
       setGenerationCount(0);
-      return;
     }
+  }, [gameStore, generationCount]);
 
-    if (generationCount === 0) {
-      setFirstGenerationGrid();
-    }
+  useEffect(() => {
+    const currentSpeed = gridSpeeds[gameStore.gridSpeed];
 
-    setGenerationCount(generationCount + 1);
-    updateGrid();
-  }, [generationCount, updateGrid, setFirstGenerationGrid, isGridEmpty]);
-
-  const handleResetOrClear = () => {
-    if (generationCount > 0) {
-      setGenerationCount(0);
-      resetGrid();
-    } else if (!isGridEmpty) {
-      clearGrid();
-    }
-  };
-
-  const handleStartOrStop = () => {
-    setIsStarted(!isStarted);
-  };
-
-  const handleNext = () => {
-    calculateNextStep();
-  };
-
-  const handleSpeedChange = (value) => {
-    setGridSpeed(value);
-  };
-
-  const handleGridSizeChange = (value) => {
-    setGridSize(value);
-  };
-
-  const handlePatternChange = (value) => {
-    if (!isGridEmpty && generationCount > 0) {
-      setGenerationCount(0);
-    }
-
-    const size = Object.keys(gridPatternsEnum)[value];
-    const letter = size.slice(size.length - 1);
-
-    setPatternGrid(value, letter);
-  };
-
-  React.useEffect(() => {
-    if (isStarted) {
+    if (isStarted && !gameStore.isGridEmpty) {
+      currentSpeedSet.current = currentSpeed;
       intervalLoop.current = setInterval(() => {
-        calculateNextStep();
-      }, gridSpeeds[gridSpeed]);
-    } else {
+        handleNext();
+      }, currentSpeed);
+    } else if (!isStarted && intervalLoop.current > 0) {
       clearInterval(intervalLoop.current);
     }
 
     return () => clearInterval(intervalLoop.current);
-  }, [isStarted, gridSpeed, updateGrid, calculateNextStep]);
+  }, [gameStore, gameStore.gridSpeed, isStarted, handleNext]);
 
-  React.useEffect(() => {
-    if (isGridEmpty && generationCount > 0) {
-      setGenerationCount(0);
-      setIsStarted(false);
-    }
-  }, [generationCount, isGridEmpty]);
+  useEffect(() => {
+    document.addEventListener('keypress', (e) => {
+      switch (e.code) {
+        case keysEnum.Space:
+          e.preventDefault();
+          handleStartOrStop();
+          break;
+        case keysEnum.KeyR:
+        case keysEnum.KeyC:
+          e.preventDefault();
+          handleResetOrClear();
+          break;
+        case keysEnum.KeyD:
+          e.preventDefault();
+          handleNext();
+          break;
+        default:
+      }
+    });
+
+    return () => document.removeEventListener('keypress', () => {});
+  }, [handleStartOrStop, handleResetOrClear, handleNext]);
 
   return (
     <Dashboard
+      gridSize={gameStore.gridSize}
+      gridSpeed={gameStore.gridSpeed}
+      gridPattern={gameStore.gridPattern}
+      isGridEmpty={gameStore.isGridEmpty}
       generationCount={generationCount}
-      gridSize={gridSize}
-      gridSpeed={gridSpeed}
-      gridPattern={gridPattern}
-      isGridEmpty={isGridEmpty}
       isStarted={isStarted}
       handleResetOrClear={handleResetOrClear}
       handleStartOrStop={handleStartOrStop}
