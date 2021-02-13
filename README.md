@@ -28,4 +28,4 @@ Will start webpack development server on ```localhost:3000``` with [hot module r
 
 # Live demo
 
-- ```https://throwawayer.github.io/life/``` - link to the demo.
+- ```[Demo](https://throwawayer.github.io/life/)``` - link to the demo.
