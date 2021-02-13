@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeObservable, observable, runInAction, action, computed } from 'mobx';
+import { makeObservable, observable, runInAction, action, computed, toJS } from 'mobx';
 
 import { gridSizes, gridSizeEnum, gridSpeedsEnum, gridPatternsEnum } from 'consts/enums';
 import {
@@ -19,7 +19,7 @@ export default class GameStore {
   gridSize;
   gridSpeed;
   gridItems;
-  gridPatternsEnum;
+  gridPattern;
   gridRowSize;
   firstGenerationGrid;
 
@@ -28,7 +28,7 @@ export default class GameStore {
       gridSize: observable,
       gridSpeed: observable,
       gridItems: observable,
-      gridPatternsEnum: observable,
+      gridPattern: observable,
       clearGrid: action,
       resetGrid: action,
       updateGrid: action,
@@ -47,11 +47,19 @@ export default class GameStore {
     this.gridItems = Array(this.totalGridSize).fill(false);
     this.gridRowSize = this.totalGridSize / 10;
     this.firstGenerationGrid = Array(this.totalGridSize).fill(false);
+
+    this.clearGrid = this.clearGrid.bind(this);
+    this.resetGrid = this.resetGrid.bind(this);
+    this.updateGrid = this.updateGrid.bind(this);
+    this.setGridSpeed = this.setGridSpeed.bind(this);
+    this.setGridSize = this.setGridSize.bind(this);
+    this.setFirstGenerationGrid = this.setFirstGenerationGrid.bind(this);
+    this.setPatternGrid = this.setPatternGrid.bind(this);
   }
 
   clearGrid() {
     runInAction(() => {
-      this.gridItems = Array(this.totalGridSize).fill(false);
+      this.gridItems = toJS(Array(this.totalGridSize).fill(false));
 
       if (this.gridPattern !== gridPatternsEnum.None) {
         this.gridPattern = gridPatternsEnum.None;
@@ -67,8 +75,9 @@ export default class GameStore {
   }
 
   updateGrid() {
+    const gridItemsDeepClone = toJS(this.gridItems);
     runInAction(() => {
-      this.gridItems = this.gridItems.map((gridItem, cellIndex) => {
+      this.gridItems = gridItemsDeepClone.map((gridItem, cellIndex) => {
         const livingSurroundingCells = [];
 
         for (let i = -1; i < 2; i += 1) {
@@ -79,7 +88,7 @@ export default class GameStore {
             upperCellIndex += this.totalGridSize;
           }
 
-          if (this.gridItems[upperCellIndex]) {
+          if (gridItemsDeepClone[upperCellIndex]) {
             livingSurroundingCells.push(true);
           }
 
@@ -90,7 +99,7 @@ export default class GameStore {
             if (
               lateralCellIndex > 0
               && lateralCellIndex < this.totalGridSize
-              && this.gridItems[lateralCellIndex]
+              && gridItemsDeepClone[lateralCellIndex]
             ) {
               livingSurroundingCells.push(true);
             }
@@ -103,7 +112,7 @@ export default class GameStore {
             bottomCellIndex -= this.totalGridSize;
           }
 
-          if (this.gridItems[bottomCellIndex]) {
+          if (gridItemsDeepClone[bottomCellIndex]) {
             livingSurroundingCells.push(true);
           }
         }
@@ -122,8 +131,8 @@ export default class GameStore {
 
   updateGridItem(itemIndex) {
     runInAction(() => {
-      this.gridItems = this.gridItems.map((gridItem, index) =>
-        (itemIndex === index ? !gridItem : gridItem),
+      this.gridItems = toJS(
+        this.gridItems.map((gridItem, index) => (itemIndex === index ? !gridItem : gridItem)),
       );
     });
   }
@@ -152,9 +161,11 @@ export default class GameStore {
         movableCellIndexes.push(aliveCellToRelocate);
       });
 
-      this.gridItems = Array(newTotalSize)
-        .fill(false)
-        .map((_, index) => movableCellIndexes.includes(index));
+      this.gridItems = toJS(
+        Array(newTotalSize)
+          .fill(false)
+          .map((_, index) => movableCellIndexes.includes(index)),
+      );
 
       this.setFirstGenerationGrid();
       this.gridSize = newGridSize;
@@ -213,9 +224,11 @@ export default class GameStore {
         }
 
         this.gridRowSize = newGridRowSize;
-        this.gridItems = Array(this.totalGridSize)
-          .fill(false)
-          .map((_, index) => patternArray.includes(index));
+        this.gridItems = toJS(
+          Array(this.totalGridSize)
+            .fill(false)
+            .map((_, index) => patternArray.includes(index)),
+        );
 
         this.setFirstGenerationGrid();
       } else {

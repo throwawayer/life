@@ -29,4 +29,11 @@ const gridPatternsEnum = Object.freeze({
   DieHardL: 9,
 });
 
-export { gridSizes, gridSizeEnum, gridSpeeds, gridSpeedsEnum, gridPatternsEnum };
+const keysEnum = Object.freeze({
+  Space: 'Space',
+  KeyR: 'KeyR',
+  KeyC: 'KeyC',
+  KeyD: 'KeyD',
+});
+
+export { gridSizes, gridSizeEnum, gridSpeeds, gridSpeedsEnum, gridPatternsEnum, keysEnum };

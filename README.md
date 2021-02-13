@@ -11,6 +11,14 @@ npm install
 ```
 npm start
 ```
+3. Build the project in production mode:
+```
+npm run build
+```
+4. Run the project in production mode:
+```
+npm run prod
+```
 
 Will start webpack development server on ```localhost:3000``` with [hot module replacement](https://webpack.js.org/concepts/hot-module-replacement/) enabled. Port is configurable via webpack development config (./webpack/dev.config.js).
 
